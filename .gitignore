@@ -1,0 +1,14 @@
+# Ignore everything by default
+/*
+
+
+!Unit06
+
+
+
+# Also track .gitignore itself
+!.gitignore
+
+# Temporarily ignore homework files
+/*/examples/
+!/README.md
