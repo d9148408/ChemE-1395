@@ -3,6 +3,7 @@
 
 
 !Unit06
+!Unit07
 
 
 
@@ -11,4 +12,6 @@
 
 # Temporarily ignore homework files
 /*/examples/
+/*/ppt/
+/*/pdf/
 !/README.md
