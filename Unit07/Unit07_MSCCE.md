@@ -557,9 +557,6 @@ Aspen Plus EXTRACT 模塊以**逐板 MES 方程組**（質量平衡 M、相平�
 
 ## 【例 MSCCE-1】水萃取丙酮——乙酸乙酯-丙酮-水體系多級逆流萃取
 
-> **本教學案例參考自影片**：KG Engineering Solutions, *"Aspen Plus: Liquid Liquid Extraction; Single Stage; Multi Stage; Countercurrent"*，YouTube，https://www.youtube.com/watch?v=rZJ2B1AOUk4
-
----
 
 ### 題目描述
 
