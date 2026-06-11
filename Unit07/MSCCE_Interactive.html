@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多級逆流萃取互動教學 | MSCCE Interactive</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+<style>
+:root {
+  --blue:#1a5faa; --green:#1a7a1a; --orange:#c0392b; --purple:#6c3483;
+  --teal:#0e7490; --gray:#555; --light:#f4f8fd; --border:#c5d8ee;
+  --feed:#2ecc71; --solvent:#3498db; --extract:#e74c3c; --raff:#f39c12;
+  --solute:#9b59b6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:#f0f4f8;color:#222;line-height:1.6}
+h1{background:linear-gradient(135deg,var(--blue),var(--teal));color:#fff;padding:18px 28px;font-size:1.4em;text-align:center}
+h2{color:var(--blue);border-bottom:2px solid var(--border);padding-bottom:6px;margin:20px 0 12px}
+h3{color:var(--teal);margin:14px 0 8px;font-size:1em}
+.subtitle{color:#e8f0fe;font-size:.85em;margin-top:4px}
+nav{display:flex;background:#1a5faa;overflow-x:auto;gap:2px;padding:0 8px}
+nav button{flex:1;min-width:110px;padding:11px 8px;border:none;background:transparent;
+  color:#b8d4f8;cursor:pointer;font-size:.9em;border-bottom:3px solid transparent;
+  transition:.2s;white-space:nowrap}
+nav button.active{color:#fff;border-bottom-color:#7ec8e3;background:rgba(255,255,255,.08)}
+nav button:hover:not(.active){color:#fff;background:rgba(255,255,255,.05)}
+.tab{display:none;padding:20px;max-width:1080px;margin:0 auto}
+.tab.active{display:block}
+.card{background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,60,120,.1);padding:18px;margin-bottom:18px}
+.row{display:flex;gap:16px;flex-wrap:wrap}
+.col{flex:1;min-width:240px}
+label{display:block;color:var(--gray);font-size:.85em;margin-bottom:3px;font-weight:600}
+input[type=range]{width:100%;height:6px;-webkit-appearance:none;background:var(--border);
+  border-radius:3px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;
+  border-radius:50%;background:var(--blue);cursor:pointer}
+.val{font-size:1.1em;font-weight:700;color:var(--blue);margin-left:8px}
+canvas{border-radius:8px;display:block;max-width:100%}
+.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.metric{background:var(--light);border:1px solid var(--border);border-radius:8px;
+  padding:12px;text-align:center}
+.metric .label{font-size:.75em;color:var(--gray);margin-bottom:4px}
+.metric .value{font-size:1.5em;font-weight:700}
+.metric.single .value{color:var(--gray)}
+.metric.cross .value{color:var(--orange)}
+.metric.counter .value{color:var(--green)}
+.badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:.8em;
+  font-weight:700;margin:2px}
+.badge-blue{background:#dbeafe;color:#1e40af}
+.badge-green{background:#dcfce7;color:#166534}
+.badge-orange{background:#ffedd5;color:#9a3412}
+.badge-red{background:#fee2e2;color:#991b1b}
+.note{background:#fffbeb;border-left:4px solid #f59e0b;padding:10px 14px;
+  border-radius:0 8px 8px 0;font-size:.88em;color:#78350f;margin:10px 0}
+.formula{background:var(--light);border-radius:8px;padding:12px;margin:8px 0;
+  text-align:center;font-size:.95em;border:1px solid var(--border)}
+button.btn{padding:8px 20px;border:none;border-radius:6px;cursor:pointer;
+  font-size:.9em;font-weight:600;transition:.2s}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-blue:hover{background:#1447a0}
+.btn-green{background:var(--green);color:#fff}
+.btn-orange{background:var(--orange);color:#fff}
+.btn-ghost{background:#e8f0fe;color:var(--blue);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--border)}
+.step-box{border:2px solid var(--border);border-radius:8px;padding:10px 14px;margin:6px 0;
+  font-size:.88em;transition:.3s}
+.step-box.active-step{border-color:var(--blue);background:#e8f0fe}
+.stage-bar{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.stage-row{display:flex;align-items:center;gap:8px;font-size:.85em}
+.bar-wrap{flex:1;background:#e5e7eb;border-radius:4px;height:16px;position:relative}
+.bar-fill{height:100%;border-radius:4px;transition:.4s}
+.bar-x{background:var(--orange)}
+.bar-y{background:var(--blue)}
+.legend-dot{width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:4px}
+.pinch-warn{background:#fef2f2;border:2px solid #fca5a5;border-radius:8px;padding:10px;
+  color:#991b1b;font-size:.88em;margin:8px 0;display:none}
+#kremser-result{background:var(--light);border-radius:8px;padding:16px;margin-top:14px}
+.result-row{display:flex;justify-content:space-between;border-bottom:1px solid var(--border);
+  padding:6px 0;font-size:.9em}
+.result-row:last-child{border-bottom:none}
+.result-val{font-weight:700;color:var(--blue)}
+footer{text-align:center;padding:16px;font-size:.8em;color:#888;background:#fff;
+  border-top:1px solid var(--border);margin-top:30px}
+@media(max-width:600px){
+  .metric-grid{grid-template-columns:1fr 1fr}
+  nav button{min-width:80px;font-size:.8em;padding:9px 4px}
+}
+</style>
+</head>
+<body>
+
+<h1>多級逆流萃取——互動學習模組
+  <div class="subtitle">Multistage Countercurrent Extraction · Interactive Teaching Module</div>
+</h1>
+
+<nav>
+  <button class="active" onclick="showTab('t1',this)">① 操作模式比較</button>
+  <button onclick="showTab('t2',this)">② Y-X 圖解互動</button>
+  <button onclick="showTab('t3',this)">③ Kremser 計算器</button>
+  <button onclick="showTab('t4',this)">④ 逐板濃度動畫</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     TAB 1 : Extraction Mode Comparison
+═══════════════════════════════════════════════════════════════════════════ -->
+<div id="t1" class="tab active">
+  <div class="card">
+    <h2>萃取操作模式效率比較</h2>
+    <p style="font-size:.9em;color:var(--gray);margin-bottom:14px">
+      調整<strong>萃取因子 E</strong> 與<strong>級數 N</strong>，即時比較三種操作模式的溶質回收率
+    </p>
+    <div class="row">
+      <div class="col">
+        <label>萃取因子 E <span class="val" id="e1-val">1.5</span></label>
+        <input type="range" id="e1" min="0.5" max="5" step="0.1" value="1.5"
+               oninput="updateTab1()">
+        <div class="formula" style="font-size:.82em">
+          \( E = KLL \cdot S'/F' \)，表示溶劑充足程度
+        </div>
+      </div>
+      <div class="col">
+        <label>多級數 N <span class="val" id="n1-val">3</span></label>
+        <input type="range" id="n1" min="1" max="10" step="1" value="3"
+               oninput="updateTab1()">
+        <div class="formula" style="font-size:.82em">
+          N 個理論板（平衡級），每板兩相達到熱力學平衡
+        </div>
+      </div>
+    </div>
+    <div class="metric-grid">
+      <div class="metric single">
+        <div class="label">單級萃取（N=1）</div>
+        <div class="value" id="m-single">60.0%</div>
+        <div style="font-size:.75em;color:#888;margin-top:2px">\( \eta = E/(1+E) \)</div>
+      </div>
+      <div class="metric cross">
+        <div class="label">錯流萃取（N 級）</div>
+        <div class="value" id="m-cross">70.4%</div>
+        <div style="font-size:.75em;color:#888;margin-top:2px">\( \eta = 1-(N/(N+E))^N \)</div>
+      </div>
+      <div class="metric counter">
+        <div class="label">逆流萃取（N 級）</div>
+        <div class="value" id="m-counter">87.7%</div>
+        <div style="font-size:.75em;color:#888;margin-top:2px">\( \eta = E(E^N-1)/(E^{N+1}-1) \)</div>
+      </div>
+    </div>
+    <canvas id="c1" height="220"></canvas>
+  </div>
+
+  <div class="card">
+    <h2>操作模式原理示意圖</h2>
+    <div style="margin-bottom:24px">
+      <h3>🔵 錯流萃取（Cross-flow）— 每級使用新鮮溶劑</h3>
+      <canvas id="c-cross" style="width:100%;display:block;border:1px solid var(--border);border-radius:8px"></canvas>
+      <p style="font-size:.82em;color:var(--gray);margin-top:8px">
+        <strong>溶劑（Solvent）</strong>自上方進入每一級（藍色越向下箭頭）；萃余相（Raffinate）水平向右流過每一級（綠色向右箭頭）；萃取相（Extract E₁～Eₙ）自各級底部分別收集後合并。溶劑總用量大（等於 N 份之和），每級傳質推動力相對較小。
+      </p>
+    </div>
+    <div>
+      <h3>🟢 逆流萃取（Countercurrent）— 同批溶劑逆向流過全塔，效率最高</h3>
+      <canvas id="c-counter" style="width:100%;display:block;border:1px solid var(--border);border-radius:8px"></canvas>
+      <p style="font-size:.82em;color:var(--gray);margin-top:8px">
+        <span style="color:#16a34a;font-weight:700">→ 進料（Feed）</span>自左向右流動，逐級將溶質轉入萃取相；
+        <span style="color:#3b82f6;font-weight:700">← 溶劑（Solvent）</span>自右向左逆流，新鮮溶劑與溶質最稀的萃余相接觸。
+        階符號 “⇅” 表示每板两相間的質量傳遞。同批溶劑利用最大化，工業首選。
+      </p>
+    </div>
+    <div class="note">
+      💡 <strong>關鍵結論</strong>：相同 E 與 N 條件下，逆流萃取回收率始終最高（見上方比較圖）。
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     TAB 2 : Interactive Y-X McCabe-Thiele
+═══════════════════════════════════════════════════════════════════════════ -->
+<div id="t2" class="tab">
+  <div class="card">
+    <h2>Y-X 操作圖與 McCabe-Thiele 逐板法</h2>
+    <p style="font-size:.9em;color:var(--gray);margin-bottom:14px">
+      調整參數，觀察平衡線、操作線與逐板階梯；
+      <span class="badge badge-blue">水平步</span> → 平衡線，
+      <span class="badge badge-green">垂直步</span> → 操作線
+    </p>
+    <div class="row">
+      <div class="col">
+        <label>液液分配係數 KLL <span class="val" id="kll-val">1.5</span></label>
+        <input type="range" id="kll" min="0.5" max="4" step="0.1" value="1.5"
+               oninput="updateTab2()">
+      </div>
+      <div class="col">
+        <label>萃取因子 E <span class="val" id="e2-val">2.0</span></label>
+        <input type="range" id="e2" min="0.6" max="6" step="0.1" value="2.0"
+               oninput="updateTab2()">
+      </div>
+      <div class="col">
+        <label>進料濃度 X_F <span class="val" id="xf-val">0.50</span></label>
+        <input type="range" id="xf" min="0.1" max="0.9" step="0.05" value="0.5"
+               oninput="updateTab2()">
+      </div>
+      <div class="col">
+        <label>目標回收率 η_target <span class="val" id="eta-val">90</span>%</label>
+        <input type="range" id="etatgt" min="50" max="99" step="1" value="90"
+               oninput="updateTab2()">
+      </div>
+    </div>
+
+    <div id="pinch-warn" class="pinch-warn">
+      ⚠️ <strong>夾緊點警告</strong>：目前 E 值接近 E_min = η_target，
+      操作線即將觸碰平衡線，需要極多理論板（理論板數→∞）。
+      請增大 E（增加溶劑量）或降低目標回收率。
+    </div>
+
+    <canvas id="c2" style="max-width:100%;display:block;border:1px solid var(--border)"></canvas>
+
+    <div class="metric-grid" style="grid-template-columns:repeat(4,1fr);margin-top:12px">
+      <div class="metric"><div class="label">理論板數 N</div>
+        <div class="value counter" id="r-N">—</div></div>
+      <div class="metric"><div class="label">X_R 出口濃度</div>
+        <div class="value" id="r-XR">—</div></div>
+      <div class="metric"><div class="label">Y_E 萃取相出口</div>
+        <div class="value" id="r-YE">—</div></div>
+      <div class="metric"><div class="label">S'_min / F'</div>
+        <div class="value" id="r-Smin">—</div></div>
+    </div>
+
+    <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-blue" onclick="animateStepping()">▶ 逐步動畫</button>
+      <button class="btn btn-ghost" onclick="updateTab2()">↺ 重設</button>
+      <button class="btn btn-ghost" id="btnPinch" onclick="setPinch()">
+        📍 顯示夾緊點
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>操作線位置與傳質方向</h2>
+    <div class="row">
+      <div class="col">
+        <h3>操作線 vs 平衡線的相對位置</h3>
+        <table style="font-size:.85em;width:100%;border-collapse:collapse">
+          <tr style="background:var(--light)">
+            <th style="padding:6px;text-align:left;border:1px solid var(--border)">操作</th>
+            <th style="padding:6px;text-align:center;border:1px solid var(--border)">操作線位置</th>
+            <th style="padding:6px;text-align:left;border:1px solid var(--border)">傳質方向</th>
+          </tr>
+          <tr>
+            <td style="padding:6px;border:1px solid var(--border)"><strong>萃取</strong></td>
+            <td style="padding:6px;text-align:center;border:1px solid var(--border)">
+              平衡線<strong>下方</strong></td>
+            <td style="padding:6px;border:1px solid var(--border)">
+              \(X > X^*\)，溶質 raffinate→extract</td>
+          </tr>
+          <tr style="background:var(--light)">
+            <td style="padding:6px;border:1px solid var(--border)">吸收</td>
+            <td style="padding:6px;text-align:center;border:1px solid var(--border)">
+              平衡線<strong>上方</strong></td>
+            <td style="padding:6px;border:1px solid var(--border)">
+              \(Y > Y^*\)，溶質 gas→liquid</td>
+          </tr>
+        </table>
+      </div>
+      <div class="col">
+        <h3>McCabe-Thiele 階梯步驟（萃取）</h3>
+        <div class="step-box" id="step1">
+          <span class="badge badge-blue">步驟 1</span> 水平向左 → 交平衡線<br>
+          固定 Y，找 \(X_{eq} = Y/KLL\)（此板達相平衡）
+        </div>
+        <div class="step-box" id="step2">
+          <span class="badge badge-green">步驟 2</span> 垂直向下 → 交操作線<br>
+          固定 X，找 \(Y_{op} = (F'/S') \cdot X + \text{const}\)（跨至下一板）
+        </div>
+        <div class="step-box">
+          <span class="badge badge-orange">重複</span> 直到 X ≤ X_R 目標值
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     TAB 3 : Kremser Calculator
+═══════════════════════════════════════════════════════════════════════════ -->
+<div id="t3" class="tab">
+  <div class="card">
+    <h2>Kremser 公式計算器</h2>
+    <p style="font-size:.9em;color:var(--gray);margin-bottom:14px">
+      稀溶液線性平衡條件下，由設計條件直接計算理論板數或所需萃取劑量
+    </p>
+    <div class="formula">
+      \[ N = \frac{\ln\!\left[\dfrac{X_F - Y_S/m}{X_R - Y_S/m}\!\left(1-\dfrac{1}{E}\right)+\dfrac{1}{E}\right]}{\ln E} \quad,\quad E = \frac{m \cdot S'}{F'} \]
+    </div>
+    <div class="row" style="margin-top:16px">
+      <div class="col">
+        <h3>輸入設計條件</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <label>KLL（液液分配係數）</label>
+            <input type="number" id="k-kll" value="1.2" step="0.1" min="0.1"
+                   style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px"
+                   oninput="calcKremser()">
+          </div>
+          <div>
+            <label>X_F（進料摩爾比）</label>
+            <input type="number" id="k-xf" value="0.43" step="0.01" min="0.01"
+                   style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px"
+                   oninput="calcKremser()">
+          </div>
+          <div>
+            <label>X_R（目標萃余相）</label>
+            <input type="number" id="k-xr" value="0.04" step="0.01" min="0.001"
+                   style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px"
+                   oninput="calcKremser()">
+          </div>
+          <div>
+            <label>Y_S（進口萃取劑，0=純）</label>
+            <input type="number" id="k-ys" value="0" step="0.01" min="0"
+                   style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px"
+                   oninput="calcKremser()">
+          </div>
+          <div>
+            <label>F'（稀釋劑流量，kmol/h）</label>
+            <input type="number" id="k-f" value="0.795" step="0.01" min="0.01"
+                   style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px"
+                   oninput="calcKremser()">
+          </div>
+          <div>
+            <label>S'（萃取劑流量，kmol/h）</label>
+            <input type="number" id="k-s" value="5.56" step="0.1" min="0.01"
+                   style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px"
+                   oninput="calcKremser()">
+          </div>
+        </div>
+        <div style="margin-top:10px">
+          <button class="btn btn-blue" onclick="calcKremser()">🧮 計算</button>
+          <button class="btn btn-ghost" style="margin-left:8px" onclick="loadExample()">
+            載入 MSCCE-1 例題
+          </button>
+        </div>
+      </div>
+      <div class="col">
+        <h3>計算結果</h3>
+        <div id="kremser-result">
+          <div class="result-row">
+            <span>萃取因子 E</span><span class="result-val" id="k-E">—</span></div>
+          <div class="result-row">
+            <span>回收率 η</span><span class="result-val" id="k-eta">—</span></div>
+          <div class="result-row">
+            <span>理論板數 N（精確）</span><span class="result-val" id="k-N">—</span></div>
+          <div class="result-row">
+            <span>整板數（ceiling N）</span><span class="result-val" id="k-Nc">—</span></div>
+          <div class="result-row">
+            <span>最小萃取劑 S'_min</span><span class="result-val" id="k-Smin">—</span></div>
+          <div class="result-row">
+            <span>實際 S' / S'_min 比</span><span class="result-val" id="k-ratio">—</span></div>
+          <div class="result-row">
+            <span>E_min（最小可行 E）</span><span class="result-val" id="k-Emin">—</span></div>
+          <div class="result-row">
+            <span>Y_E（萃取相出口）</span><span class="result-val" id="k-ye">—</span></div>
+        </div>
+
+        <h3 style="margin-top:16px">N 與 η 敏感度（固定 E）</h3>
+        <canvas id="c3" height="200"
+                style="width:100%;border:1px solid var(--border);border-radius:8px"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     TAB 4 : Stage-by-Stage Column Animation
+═══════════════════════════════════════════════════════════════════════════ -->
+<div id="t4" class="tab">
+  <div class="card">
+    <h2>逆流萃取塔逐板濃度動畫</h2>
+    <p style="font-size:.9em;color:var(--gray);margin-bottom:14px">
+      動態顯示各板上萃余相（X）與萃取相（Y）的濃度分布，觀察溶質沿塔的傳遞過程
+    </p>
+    <div class="row">
+      <div class="col">
+        <label>KLL <span class="val" id="kll4-val">1.5</span></label>
+        <input type="range" id="kll4" min="0.5" max="4" step="0.1" value="1.5"
+               oninput="updateTab4()">
+      </div>
+      <div class="col">
+        <label>萃取因子 E <span class="val" id="e4-val">2.0</span></label>
+        <input type="range" id="e4" min="0.6" max="6" step="0.1" value="2.0"
+               oninput="updateTab4()">
+      </div>
+      <div class="col">
+        <label>進料 X_F <span class="val" id="xf4-val">0.50</span></label>
+        <input type="range" id="xf4" min="0.1" max="0.9" step="0.05" value="0.5"
+               oninput="updateTab4()">
+      </div>
+      <div class="col">
+        <label>板數 N <span class="val" id="n4-val">5</span></label>
+        <input type="range" id="n4" min="1" max="10" step="1" value="5"
+               oninput="updateTab4()">
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin:10px 0">
+      <button class="btn btn-blue" onclick="startColAnim()">▶ 播放動畫</button>
+      <button class="btn btn-ghost" onclick="stopColAnim()">⏸ 暫停</button>
+      <button class="btn btn-ghost" onclick="resetColAnim()">↺ 重設</button>
+      <span style="margin-left:auto;font-size:.85em;color:var(--gray)">
+        <span class="legend-dot" style="background:var(--orange)"></span>萃余相 X（稀釋劑相）&nbsp;
+        <span class="legend-dot" style="background:var(--blue)"></span>萃取相 Y（溶劑相）
+      </span>
+    </div>
+
+    <div class="row">
+      <div class="col" style="min-width:260px;flex:0 0 280px">
+        <canvas id="c4-col" width="280" height="440"
+                style="border:1px solid var(--border);border-radius:8px;width:100%"></canvas>
+      </div>
+      <div class="col">
+        <h3>各板濃度分布（穩態）</h3>
+        <canvas id="c4-bar" height="300"
+                style="width:100%;border:1px solid var(--border);border-radius:8px"></canvas>
+        <div id="stage-bars" class="stage-bar" style="margin-top:12px"></div>
+        <div class="note" style="margin-top:10px">
+          <strong>閱讀說明</strong>：<br>
+          板號由頂（Aspen Stage 1）至底（Stage N）。圖中顯示 Aspen 板號——
+          重相（Phase I）自板 1 進、板 N 出；輕相（Phase II）自板 N 進、板 1 出。
+          在 Y-X 理論中，板 N（底部，X 相進入）對應 McCabe-Thiele 圖的「進料端 Stage 1」。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  逢甲大學 化工系 智慧程序系統工程實驗室 ·
+  化工程序模擬 ChemE 1395 Unit07 進階 — 多級逆流萃取 ·
+  2026-06-11 · CC BY-NC-SA 4.0
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     JavaScript
+═══════════════════════════════════════════════════════════════════════════ -->
+<script>
+// ── Utility ──────────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function eta_single(E){return E/(1+E)}
+function eta_cross(E,N){return 1-Math.pow(N/(N+E),N)}
+function eta_counter(E,N){
+  if(Math.abs(E-1)<1e-6)return N/(N+1);
+  return E*(Math.pow(E,N)-1)/(Math.pow(E,N+1)-1);
+}
+function kremser_N(E,q){
+  // q = (XF-YS/m)/(XR-YS/m), E ≠ 1
+  if(Math.abs(E-1)<1e-6){return q-1;}
+  const arg = q*(1-1/E)+1/E;
+  if(arg<=0)return Infinity;
+  return Math.log(arg)/Math.log(E);
+}
+
+// ── Tab Navigation ────────────────────────────────────────────────────────────
+function showTab(id,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  $(id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='t1')setTimeout(updateTab1,50);
+  if(id==='t2')setTimeout(updateTab2,50);
+  if(id==='t3')setTimeout(calcKremser,50);
+  if(id==='t4')setTimeout(updateTab4,50);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TAB 1
+// ═══════════════════════════════════════════════════════════════════════════
+function updateTab1(){
+  const E=parseFloat($('e1').value), N=parseInt($('n1').value);
+  $('e1-val').textContent=E.toFixed(1);
+  $('n1-val').textContent=N;
+  const s=eta_single(E)*100, cr=eta_cross(E,N)*100, co=eta_counter(E,N)*100;
+  $('m-single').textContent=s.toFixed(1)+'%';
+  $('m-cross').textContent=cr.toFixed(1)+'%';
+  $('m-counter').textContent=co.toFixed(1)+'%';
+  drawBar1(E,N,s,cr,co);
+  drawSchematic('c-cross',E,N,'cross');
+  drawSchematic('c-counter',E,N,'counter');
+}
+
+function drawBar1(E,N,s,cr,co){
+  const cv=$('c1'), ctx=cv.getContext('2d');
+  cv.width=cv.parentElement.clientWidth||520;
+  const W=cv.width, H=cv.height;
+  ctx.clearRect(0,0,W,H);
+
+  const labels=['Single','Cross-flow','Counter'];
+  const vals=[s,cr,co];
+  const colors=['#9ca3af','#ea580c','#16a34a'];
+  const barW=Math.min(90,(W-80)/3-12);
+  const gap=(W-barW*3)/4;
+  const maxH=H-60, baseY=H-30;
+
+  ctx.fillStyle='#f9fafb';
+  ctx.fillRect(0,0,W,H);
+
+  // Grid lines
+  [0,25,50,75,100].forEach(v=>{
+    const y=baseY-v/100*maxH;
+    ctx.strokeStyle=v===0?'#9ca3af':'#e5e7eb';
+    ctx.lineWidth=v===0?1.5:.8;
+    ctx.beginPath();ctx.moveTo(40,y);ctx.lineTo(W-10,y);ctx.stroke();
+    ctx.fillStyle='#9ca3af';ctx.font='11px sans-serif';ctx.textAlign='right';
+    ctx.fillText(v+'%',36,y+4);
+  });
+
+  // Bars
+  vals.forEach((v,i)=>{
+    const x=gap+(barW+gap)*i+40;
+    const bh=v/100*maxH;
+    // Shadow
+    ctx.fillStyle='rgba(0,0,0,.06)';
+    ctx.fillRect(x+3,baseY-bh+3,barW,bh);
+    // Bar
+    const grad=ctx.createLinearGradient(x,baseY-bh,x,baseY);
+    grad.addColorStop(0,colors[i]+'ee');
+    grad.addColorStop(1,colors[i]+'99');
+    ctx.fillStyle=grad;
+    ctx.beginPath();ctx.roundRect(x,baseY-bh,barW,bh,4);ctx.fill();
+    // Value
+    ctx.fillStyle=colors[i];ctx.font='bold 14px sans-serif';ctx.textAlign='center';
+    ctx.fillText(v.toFixed(1)+'%',x+barW/2,baseY-bh-6);
+    // Label
+    ctx.fillStyle='#4b5563';ctx.font='11px sans-serif';
+    ctx.fillText(labels[i],x+barW/2,baseY+14);
+    // N label
+    if(i>0){ctx.fillStyle='#6b7280';ctx.fillText('N='+N,x+barW/2,baseY+26);}
+  });
+
+  // E label
+  ctx.fillStyle='#1a5faa';ctx.font='13px sans-serif';ctx.textAlign='left';
+  ctx.fillText('E = '+E.toFixed(1)+'   N = '+N,44,20);
+}
+
+function drawSchematic(canvasId,E,N,mode){
+  const cv=$(canvasId);
+  const W=Math.max(cv.parentElement?(cv.parentElement.clientWidth-4):560,360);
+  const H=220;
+  cv.width=W; cv.height=H;
+  const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#fafbfc'; ctx.fillRect(0,0,W,H);
+
+  const nShow=Math.min(N,5);
+  // Stage-by-stage normalised concentrations (1=feed-end, 0=solvent-end)
+  const xN=[], yN=[];
+  if(mode==='cross'){
+    let Xc=1.0;
+    for(let i=0;i<nShow;i++){
+      const eff=eta_single(E/nShow);
+      xN.push(Xc); yN.push(Xc*eff);
+      Xc*=(1-eff);
+    }
+  }else{
+    const et=eta_counter(E,nShow);
+    for(let i=0;i<nShow;i++){
+      // i=0: Stage 1 / feed-end (left), i=nShow-1: Stage N / solvent-end (right)
+      const t=i/Math.max(nShow-1,1);
+      xN.push(1-et*t);
+      yN.push(et*(1-t));
+    }
+  }
+
+  // Layout
+  const LM=74, RM=82;
+  const avail=W-LM-RM;
+  const sw=Math.min(66,avail/nShow*0.54);
+  const gap=(avail-sw*nShow)/(nShow+1);
+  const sL=[], sCx=[];
+  for(let i=0;i<nShow;i++){
+    const x=LM+gap+i*(sw+gap);
+    sL.push(x); sCx.push(x+sw/2);
+  }
+
+  // Draw helpers
+  function arw(x1,y1,x2,y2,col,lw,hs){
+    ctx.strokeStyle=col; ctx.lineWidth=lw||1.8; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    const dx=x2-x1,dy=y2-y1,d=Math.sqrt(dx*dx+dy*dy)||1;
+    arrowHead(ctx,x2,y2,dx/d,dy/d,col,hs||6);
+  }
+  function lbl(s,x,y,align,col,bold,fs){
+    ctx.fillStyle=col||'#374151'; ctx.textAlign=align||'center';
+    ctx.font=(bold?'bold ':'')+((fs||10)+'px sans-serif');
+    ctx.fillText(s,x,y);
+  }
+
+  // ── CROSS-FLOW ─────────────────────────────────────────────────────────────
+  if(mode==='cross'){
+    const tankTopY=10, tankH=22;
+    const stY=50,  stH=54;
+    const feedY=stY+stH/2+2;
+    const exY1=stY+stH+5, exY2=H-22;
+
+    // Green shading for feed lane
+    ctx.fillStyle='rgba(220,252,231,0.35)';
+    ctx.fillRect(LM-8,stY-5,avail+16,stH+10);
+
+    // Solvent tanks + downward arrows (fresh solvent enters from ABOVE each stage)
+    for(let i=0;i<nShow;i++){
+      ctx.fillStyle='#dbeafe'; ctx.strokeStyle='#3b82f6'; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.roundRect(sCx[i]-18,tankTopY,36,tankH,3); ctx.fill(); ctx.stroke();
+      lbl('Solvent',sCx[i],tankTopY+15,'center','#1e40af',true,9);
+      arw(sCx[i],tankTopY+tankH,sCx[i],stY-2,'#3b82f6',1.6,5);
+    }
+
+    // Feed arrow + label
+    arw(6,feedY,sL[0]-2,feedY,'#16a34a',2.2);
+    lbl('Feed',LM/2,feedY-9,'center','#14532d',true,10);
+    lbl('(X\u2080)',LM/2,feedY+10,'center','#14532d',false,9);
+
+    // Stage boxes + inter-stage + raffinate arrows
+    for(let i=0;i<nShow;i++){
+      const a=clamp(xN[i],0.12,0.92);
+      ctx.fillStyle=`rgba(251,146,60,${a*0.85})`; ctx.strokeStyle='#ea580c'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.roundRect(sL[i],stY,sw,stH,5); ctx.fill(); ctx.stroke();
+      lbl('Stage',sCx[i],stY+stH/2-4,'center','#7c2d12',true,9);
+      lbl(''+(i+1),sCx[i],stY+stH/2+9,'center','#7c2d12',false,10);
+      const x2=(i<nShow-1)?sL[i+1]-1:W-6;
+      arw(sL[i]+sw,feedY,x2,feedY,'#16a34a',i<nShow-1?1.8:2.2);
+    }
+    lbl('Raffinate',W-RM/2,feedY-9,'center','#14532d',true,10);
+    lbl('(X_R)',W-RM/2,feedY+10,'center','#14532d',false,9);
+
+    // Extract arrows downward from each stage
+    for(let i=0;i<nShow;i++){
+      const col=`rgba(59,130,246,${clamp(yN[i]+0.2,0.3,0.95)})`;
+      ctx.strokeStyle=col; ctx.lineWidth=1.8; ctx.setLineDash([]);
+      ctx.beginPath(); ctx.moveTo(sCx[i],exY1); ctx.lineTo(sCx[i],exY2); ctx.stroke();
+      arrowHead(ctx,sCx[i],exY2,0,1,'#3b82f6',6);
+      lbl('E'+(i+1),sCx[i],exY2+13,'center','#1e40af',true,9);
+    }
+    ctx.strokeStyle='#93c5fd'; ctx.lineWidth=1; ctx.setLineDash([4,2]);
+    ctx.beginPath(); ctx.moveTo(sCx[0],exY2+2); ctx.lineTo(sCx[nShow-1],exY2+2); ctx.stroke();
+    ctx.setLineDash([]);
+    lbl('Combined Extract  (Y enriched)',(sCx[0]+sCx[nShow-1])/2,H-6,'center','#1e40af',false,9);
+
+  // ── COUNTERCURRENT ─────────────────────────────────────────────────────────
+  }else{
+    const xLaneY=26;
+    const yLaneY=H-34;
+    const stTopY=xLaneY+24;
+    const stBotY=yLaneY-24;
+    const stH2=stBotY-stTopY;
+    const halfH=stH2/2;
+    const stCy=stTopY+stH2/2;
+
+    // Background zone hints
+    ctx.fillStyle='rgba(220,252,231,0.25)';
+    ctx.fillRect(0,0,W,xLaneY+16);
+    ctx.fillStyle='rgba(219,234,254,0.25)';
+    ctx.fillRect(0,yLaneY-16,W,H-(yLaneY-16));
+
+    // Stage boxes: orange top (X-phase) + blue bottom (Y-phase)
+    for(let i=0;i<nShow;i++){
+      const aX=clamp(xN[i],0.1,0.9);
+      ctx.fillStyle=`rgba(251,146,60,${aX*0.85})`; ctx.strokeStyle='#ea580c'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.roundRect(sL[i],stTopY,sw,halfH,[5,5,0,0]); ctx.fill(); ctx.stroke();
+      const aY=clamp(yN[i],0.05,0.9);
+      ctx.fillStyle=`rgba(59,130,246,${aY*0.85})`; ctx.strokeStyle='#3b82f6'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.roundRect(sL[i],stTopY+halfH,sw,halfH,[0,0,5,5]); ctx.fill(); ctx.stroke();
+      lbl('S'+(i+1),sCx[i],stCy+4,'center','#1e293b',true,11);
+      // Mass-transfer symbol at phase interface
+      lbl('\u21c5',sCx[i]+sw/2-9,stTopY+halfH+5,'center','#7c3aed',false,14);
+    }
+
+    // X-PHASE LANE: Feed (left) → Raffinate (right)
+    arw(6,xLaneY,sL[0]-2,xLaneY,'#16a34a',2.2);
+    lbl('Feed',LM/2,xLaneY-9,'center','#14532d',true,10);
+    lbl('(X\u2080)',LM/2,xLaneY+8,'center','#14532d',false,9);
+    for(let i=0;i<nShow-1;i++) arw(sL[i]+sw,xLaneY,sL[i+1]-1,xLaneY,'#16a34a',1.8);
+    arw(sL[nShow-1]+sw,xLaneY,W-6,xLaneY,'#16a34a',2.2);
+    lbl('Raffinate',W-RM/2,xLaneY-9,'center','#14532d',true,10);
+    lbl('(X_R)',W-RM/2,xLaneY+8,'center','#14532d',false,9);
+    for(let i=0;i<nShow;i++){
+      ctx.strokeStyle='#16a34a'; ctx.lineWidth=1; ctx.setLineDash([2,2]);
+      ctx.beginPath(); ctx.moveTo(sCx[i],xLaneY); ctx.lineTo(sCx[i],stTopY); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // Y-PHASE LANE: Solvent (right) → Extract (left)
+    arw(W-6,yLaneY,sL[nShow-1]+sw+2,yLaneY,'#3b82f6',2.2);
+    lbl('Solvent',W-RM/2,yLaneY-9,'center','#1e40af',true,10);
+    lbl('(Y_S=0)',W-RM/2,yLaneY+8,'center','#1e40af',false,9);
+    for(let i=nShow-1;i>0;i--) arw(sL[i]-1,yLaneY,sL[i-1]+sw+2,yLaneY,'#3b82f6',1.8);
+    arw(sL[0]-1,yLaneY,6,yLaneY,'#3b82f6',2.2);
+    lbl('Extract',LM/2,yLaneY-9,'center','#1e40af',true,10);
+    lbl('(Y_E)',LM/2,yLaneY+8,'center','#1e40af',false,9);
+    for(let i=0;i<nShow;i++){
+      ctx.strokeStyle='#3b82f6'; ctx.lineWidth=1; ctx.setLineDash([2,2]);
+      ctx.beginPath(); ctx.moveTo(sCx[i],stBotY); ctx.lineTo(sCx[i],yLaneY); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // Bottom annotation
+    lbl('\u2190 Extract enriched (Y\u2191)  \u2003  Feed depleted (X\u2193) \u2192',
+        W/2,H-8,'center','#6b7280',false,9);
+  }
+
+  ctx.font='11px sans-serif'; ctx.textAlign='left';
+}
+
+function arrowHead(ctx,x,y,dx,dy,color,size){
+  ctx.fillStyle=color;
+  ctx.beginPath();
+  ctx.moveTo(x,y);
+  ctx.lineTo(x-dy*size-dx*size,y+dx*size-dy*size);
+  ctx.lineTo(x+dy*size-dx*size,y-dx*size-dy*size);
+  ctx.closePath();ctx.fill();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TAB 2 — Y-X Interactive
+// ═══════════════════════════════════════════════════════════════════════════
+let animStep=0, animTimer=null, animData={};
+
+function updateTab2(){
+  const kll=parseFloat($('kll').value);
+  const E=parseFloat($('e2').value);
+  const XF=parseFloat($('xf').value);
+  const etaTgt=parseFloat($('etatgt').value)/100;
+  $('kll-val').textContent=kll.toFixed(1);
+  $('e2-val').textContent=E.toFixed(1);
+  $('xf-val').textContent=XF.toFixed(2);
+  $('eta-val').textContent=($('etatgt').value);
+
+  const FoS=kll/E;
+  const XR=XF*(1-etaTgt);
+  const YE=FoS*(XF-XR);
+  const SminOF=etaTgt/kll;
+  const NexactRaw=kremser_N(E, XF/XR);  // q=XF/XR when YS=0 (Tab 2 always uses pure solvent)
+  const Nexact=isFinite(NexactRaw)?NexactRaw:999;
+  const Emin=etaTgt;
+  const pinch=E<Emin*1.05;
+
+  $('r-N').textContent=isFinite(NexactRaw)?Nexact.toFixed(2):'∞';
+  $('r-XR').textContent=XR.toFixed(4);
+  $('r-YE').textContent=YE.toFixed(4);
+  $('r-Smin').textContent=SminOF.toFixed(3);
+  $('pinch-warn').style.display=pinch?'block':'none';
+
+  animData={kll,E,XF,XR,YE,FoS,Nexact,pinch};
+  clearInterval(animTimer);
+  drawYX(kll,E,XF,XR,YE,FoS,Nexact,-1);
+}
+
+function drawYX(kll,E,XF,XR,YE,FoS,Nexact,highlightStep){
+  const cv=$('c2');
+  // Square canvas → equal pixels-per-unit on X and Y (true 1:1 aspect ratio)
+  const W=Math.min(cv.parentElement?(cv.parentElement.clientWidth-4):560,600);
+  // ── True 1:1 aspect ratio that fills horizontal width ──────────────────
+  // Design principle:
+  //   scale = draw_w / Xmax   (derived from X axis — X always fills width)
+  //   draw_h = scale * Ymax   (Y height follows from SAME scale → 1:1)
+  //   H = pad.t + pad.b + draw_h  (canvas height adapts to content)
+  //
+  // This guarantees: visual slope of eq. line = arctan(KLL) at ALL times,
+  // AND the chart always fills the horizontal space.
+  //
+  // Previous approach (scale = min(avail/X, avail/Y)) forced a square canvas
+  // which made draw_w = avail × Xmax/Ymax = only ~24% of width when
+  // Ymax = kllMax×Xmax×1.05 = 2.415 with kllMax=4, XF=0.5.
+  const pad={l:62,r:24,t:22,b:54};
+  const draw_w=W-pad.l-pad.r;   // X axis always fills container width
+
+  const Xmax=XF*1.15;
+  const scale=draw_w/Xmax;      // 1:1 px/unit — derived from X axis
+
+  // Ymax adapts to current kll: higher KLL → taller chart (correct eq. slope)
+  // Ensure (XF, YE) always visible; cap at 1.5× width to limit scroll.
+  const Ymax_raw=Math.max(kll*Xmax*1.05, YE*1.2);
+  const max_draw_h=Math.max(draw_w*1.5, scale*YE*1.2);
+  const draw_h=Math.min(scale*Ymax_raw, max_draw_h);
+  const Ymax=draw_h/scale;       // effective Y range (≥ YE·1.2 guaranteed)
+
+  const H=Math.round(pad.t+pad.b+draw_h);
+  cv.width=W; cv.height=H;
+  const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+
+  const ox=pad.l;    // canvas x of X=0
+  const oy=pad.t;    // canvas y of Y=Ymax (= H - pad.b - draw_h = pad.t)
+
+  function px(x){return ox+x*scale;}
+  function py(y){return oy+draw_h-y*scale;}  // y=0 → oy+draw_h
+
+  // Nice tick interval (rounds to 1, 2, 5 × 10^n)
+  function niceTick(maxV,tgt){
+    const r=maxV/tgt;
+    const e=Math.floor(Math.log10(r));
+    const b=Math.pow(10,e);
+    const f=r/b;
+    return(f<1.5?1:f<3.5?2:f<7.5?5:10)*b;
+  }
+  const xTick=niceTick(Xmax,5);
+  const yTick=niceTick(Ymax,5);
+
+  // Background
+  ctx.fillStyle='#fafbfc';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#fff';ctx.fillRect(ox,oy,draw_w,draw_h);
+
+  // Grid
+  ctx.strokeStyle='#e5e7eb';ctx.lineWidth=.8;
+  for(let xv=0;xv<=Xmax*1.001;xv=parseFloat((xv+xTick).toFixed(10))){
+    ctx.beginPath();ctx.moveTo(px(xv),oy);ctx.lineTo(px(xv),oy+draw_h);ctx.stroke();
+    ctx.fillStyle='#9ca3af';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillText(xv.toFixed(2),px(xv),oy+draw_h+16);
+  }
+  for(let yv=0;yv<=Ymax*1.001;yv=parseFloat((yv+yTick).toFixed(10))){
+    ctx.beginPath();ctx.moveTo(ox,py(yv));ctx.lineTo(ox+draw_w,py(yv));ctx.stroke();
+    ctx.fillStyle='#9ca3af';ctx.font='11px sans-serif';ctx.textAlign='right';
+    ctx.fillText(yv.toFixed(2),ox-6,py(yv)+4);
+  }
+
+  // Axes (L-shape)
+  ctx.strokeStyle='#374151';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(ox,oy+draw_h);
+  ctx.lineTo(ox+draw_w,oy+draw_h);ctx.stroke();
+
+  // Axis labels
+  ctx.fillStyle='#374151';ctx.font='13px sans-serif';ctx.textAlign='center';
+  ctx.fillText('X  (Raffinate mole ratio)',ox+draw_w/2,oy+draw_h+36);
+  ctx.save();ctx.translate(14,oy+draw_h/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText('Y  (Extract mole ratio)',0,0);ctx.restore();
+
+  // Clip chart content to chart rectangle
+  ctx.save();
+  ctx.beginPath();ctx.rect(ox,oy,draw_w,draw_h);ctx.clip();
+
+  // Driving force shading
+  const Xfill=[];
+  for(let i=0;i<=60;i++)Xfill.push(XR+(XF-XR)*i/60);
+  ctx.beginPath();
+  Xfill.forEach((xv,i)=>{
+    const yEq=kll*xv, yOp=FoS*xv+(YE-FoS*XF);
+    if(i===0){ctx.moveTo(px(xv),py(yEq));}else{ctx.lineTo(px(xv),py(yEq));}
+  });
+  for(let i=Xfill.length-1;i>=0;i--){
+    const xv=Xfill[i], yOp=FoS*xv+(YE-FoS*XF);
+    ctx.lineTo(px(xv),py(yOp));
+  }
+  ctx.closePath();ctx.fillStyle='rgba(22,163,74,.08)';ctx.fill();
+
+  // Equilibrium line
+  ctx.strokeStyle='#1a5faa';ctx.lineWidth=2.5;ctx.setLineDash([]);
+  ctx.beginPath();ctx.moveTo(px(0),py(0));ctx.lineTo(px(Xmax),py(kll*Xmax));ctx.stroke();
+  ctx.fillStyle='#1a5faa';ctx.font='bold 12px sans-serif';ctx.textAlign='left';
+  ctx.fillText('Equilibrium Y*='+kll.toFixed(1)+'X',px(Xmax*0.6)+4,py(kll*Xmax*0.6)-6);
+
+  // Operating line
+  ctx.strokeStyle='#c0392b';ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(px(XR),py(0));ctx.lineTo(px(XF),py(YE));ctx.stroke();
+  ctx.fillStyle='#c0392b';ctx.font='bold 11px sans-serif';ctx.textAlign='right';
+  ctx.fillText('Operating Line (slope F\'/S\'='+FoS.toFixed(2)+')',px(XF)-4,py(YE)-8);
+
+  // Min solvent line (pinch)
+  const YEstar=kll*XF;
+  ctx.strokeStyle='#9ca3af';ctx.lineWidth=1.5;ctx.setLineDash([6,4]);
+  ctx.beginPath();ctx.moveTo(px(XR),py(0));ctx.lineTo(px(XF),py(YEstar));ctx.stroke();
+  ctx.setLineDash([]);
+
+  // McCabe-Thiele stepping
+  const steps=[];
+  let Xc=XF, Yc=YE;
+  for(let s=0;s<Math.min(Math.ceil(Nexact)+3,15);s++){
+    const Xeq=Yc/kll;
+    steps.push({type:'H',x0:Xc,y0:Yc,x1:Xeq,y1:Yc});
+    Xc=Xeq;
+    if(Xc<=XR*1.001)break;
+    const Yop=FoS*Xc+(YE-FoS*XF);
+    steps.push({type:'V',x0:Xc,y0:Yc,x1:Xc,y1:Yop});
+    Yc=Yop;
+  }
+  const showSteps=(highlightStep<0)?steps.length:highlightStep;
+  steps.slice(0,showSteps).forEach((st,i)=>{
+    const isLast=i===showSteps-1;
+    ctx.lineWidth=isLast?3:2;
+    ctx.strokeStyle=st.type==='H'?'rgba(22,163,74,.9)':'rgba(22,163,74,.7)';
+    ctx.setLineDash(isLast?[5,3]:[]);
+    ctx.beginPath();ctx.moveTo(px(st.x0),py(st.y0));ctx.lineTo(px(st.x1),py(st.y1));ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // Stage equilibrium points
+  let nStage=0;
+  steps.forEach((st,i)=>{
+    if(st.type==='H'){
+      nStage++;
+      const sx=px(st.x1),sy=py(st.y1);
+      ctx.fillStyle='rgba(22,163,74,.85)';
+      if(i<showSteps){
+        ctx.beginPath();ctx.arc(sx,sy,5,0,2*Math.PI);ctx.fill();
+        ctx.fillStyle='#14532d';ctx.font='bold 11px sans-serif';ctx.textAlign='left';
+        ctx.fillText('Stage '+nStage,sx+7,sy-4);
+      }
+    }
+  });
+
+  // End clip region — terminal points, pinch marker and legend draw on top
+  ctx.restore();
+
+  // Terminal points — (X_F,Y_E) label below the dot; (X_R,0) label above
+  ctx.font='11px sans-serif';
+  [[XF,YE,'(X_F,Y_E)','#c0392b',18],[XR,0,'(X_R,0)','#c0392b',-12]].forEach(([x,y,lb,c,dy])=>{
+    ctx.fillStyle=c;
+    ctx.beginPath();ctx.arc(px(x),py(y),7,0,2*Math.PI);ctx.fill();
+    ctx.fillStyle=c;ctx.textAlign='center';
+    ctx.fillText(lb,px(x),py(y)+dy);
+  });
+
+  // Pinch point marker
+  ctx.fillStyle='#9ca3af';
+  ctx.beginPath();ctx.arc(px(XF),py(YEstar),5,0,2*Math.PI);ctx.fill();
+  ctx.fillStyle='#6b7280';ctx.font='10px sans-serif';ctx.textAlign='right';
+  ctx.fillText('Pinch',px(XF)-4,py(YEstar)+12);
+
+  // Legend
+  const lx=ox+10, ly=oy+10;
+  [[`Equilibrium (KLL=${kll.toFixed(1)})`,'#1a5faa',false],
+   [`Operating Line (E=${E.toFixed(1)})`,'#c0392b',false],
+   [`McCabe-Thiele steps`,'#16a34a',false],
+   [`Min-S line (Pinch)`,'#9ca3af',true]].forEach(([lb,c,dash],i)=>{
+    const y=ly+i*18;
+    ctx.strokeStyle=c;ctx.lineWidth=2;ctx.setLineDash(dash?[5,3]:[]);
+    ctx.beginPath();ctx.moveTo(lx,y+5);ctx.lineTo(lx+22,y+5);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#374151';ctx.font='11px sans-serif';ctx.textAlign='left';
+    ctx.fillText(lb,lx+26,y+9);
+  });
+
+  return steps;
+}
+
+function animateStepping(){
+  clearInterval(animTimer);
+  const {kll,E,XF,XR,YE,FoS,Nexact}=animData;
+  let step=0;
+  const maxS=Math.min(Math.ceil(Nexact)*2+4,30);
+  animTimer=setInterval(()=>{
+    step++;
+    drawYX(kll,E,XF,XR,YE,FoS,Nexact,step);
+    if(step>=maxS)clearInterval(animTimer);
+  },500);
+}
+
+function setPinch(){
+  const kll=parseFloat($('kll').value);
+  const etaTgt=parseFloat($('etatgt').value)/100;
+  const Emin=etaTgt;
+  const eSlider=$('e2');
+  eSlider.value=Math.max(parseFloat(eSlider.min),(Emin*1.001).toFixed(2));
+  updateTab2();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TAB 3 — Kremser Calculator
+// ═══════════════════════════════════════════════════════════════════════════
+function loadExample(){
+  $('k-kll').value=1.2; $('k-xf').value=0.43; $('k-xr').value=0.04;
+  $('k-ys').value=0; $('k-f').value=0.795; $('k-s').value=5.56;
+  calcKremser();
+}
+
+function calcKremser(){
+  const m=parseFloat($('k-kll').value)||1.2;
+  const XF=parseFloat($('k-xf').value)||0.43;
+  const XR=parseFloat($('k-xr').value)||0.04;
+  const YS=parseFloat($('k-ys').value)||0;
+  const Fp=parseFloat($('k-f').value)||1;
+  const Sp=parseFloat($('k-s').value)||1;
+
+  const E=m*Sp/Fp;
+  const eta=(XF-XR)/XF;
+  const q=(XF-YS/m)/(XR-YS/m);
+  const Nraw=kremser_N(E,q);
+  const Nc=isFinite(Nraw)?Math.ceil(Nraw):999;
+  // S'_min/F' general formula: (XF-XR)/(m·XF - YS)  [eta/m is only valid when YS=0]
+  const SminF=(m*XF-YS)>0 ? (XF-XR)/(m*XF-YS) : Infinity;
+  const ratio=isFinite(SminF) ? Sp/(SminF*Fp) : 0;
+  // E_min = m·S'_min/F' (same formula, avoids redundant computation)
+  const Emin=isFinite(SminF) ? m*SminF : Infinity;
+  const YE=(Fp/Sp)*(XF-XR)+YS;
+
+  const infeasible=!isFinite(Nraw);
+  $('k-E').textContent=E.toFixed(3);
+  $('k-eta').textContent=(eta*100).toFixed(2)+'%';
+  $('k-N').textContent=infeasible?'∞（E ＜ E_min）':Nraw.toFixed(3);
+  $('k-N').style.color=infeasible?'#dc2626':'';
+  $('k-Nc').textContent=infeasible?'無可行解':Nc;
+  $('k-Nc').style.color=infeasible?'#dc2626':'';
+  $('k-Smin').textContent=isFinite(SminF)?(SminF.toFixed(4)+' × F\''):'∞';
+  $('k-ratio').textContent=isFinite(ratio)?ratio.toFixed(2)+'×':'—';
+  $('k-Emin').textContent=isFinite(Emin)?Emin.toFixed(3):'∞';
+  $('k-ye').textContent=YE.toFixed(4);
+
+  drawKremserCurve(E,eta,m,q);
+}
+
+function drawKremserCurve(Ecur,etaTgt,kll,q_val){
+  const cv=$('c3');
+  const W=cv.clientWidth||300, H=cv.height||200;
+  cv.width=W; cv.height=H;
+  const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#f9fafb';ctx.fillRect(0,0,W,H);
+  const pad={l:40,r:10,t:14,b:36};
+  const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
+  function px(n){return pad.l+(n-1)/(12-1)*iw;}
+  function py(y){return pad.t+ih-y/100*ih;}
+
+  // Grid
+  [0,25,50,75,100].forEach(v=>{
+    ctx.strokeStyle='#e5e7eb';ctx.lineWidth=.8;
+    ctx.beginPath();ctx.moveTo(pad.l,py(v));ctx.lineTo(pad.l+iw,py(v));ctx.stroke();
+    ctx.fillStyle='#9ca3af';ctx.font='10px sans-serif';ctx.textAlign='right';
+    ctx.fillText(v+'%',pad.l-3,py(v)+3);
+  });
+  [1,3,5,7,9,11].forEach(n=>{
+    ctx.strokeStyle='#e5e7eb';ctx.lineWidth=.8;
+    ctx.beginPath();ctx.moveTo(px(n),pad.t);ctx.lineTo(px(n),pad.t+ih);ctx.stroke();
+    ctx.fillStyle='#9ca3af';ctx.font='10px sans-serif';ctx.textAlign='center';
+    ctx.fillText(n,px(n),pad.t+ih+13);
+  });
+
+  ctx.fillStyle='#6b7280';ctx.font='10px sans-serif';ctx.textAlign='center';
+  ctx.fillText('N (stages)',pad.l+iw/2,H-4);
+
+  // Countercurrent line
+  ctx.strokeStyle='#16a34a';ctx.lineWidth=2;
+  ctx.beginPath();
+  for(let n=1;n<=12;n++){
+    const y=eta_counter(Ecur,n)*100;
+    if(n===1)ctx.moveTo(px(n),py(y));else ctx.lineTo(px(n),py(y));
+  }
+  ctx.stroke();
+
+  // Target line
+  ctx.strokeStyle='#dc2626';ctx.lineWidth=1.5;ctx.setLineDash([5,3]);
+  ctx.beginPath();ctx.moveTo(pad.l,py(etaTgt*100));ctx.lineTo(pad.l+iw,py(etaTgt*100));ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#dc2626';ctx.font='10px sans-serif';ctx.textAlign='right';
+  ctx.fillText('Target η='+( etaTgt*100).toFixed(0)+'%',pad.l+iw,py(etaTgt*100)-3);
+
+  // Dot: N stages needed to achieve etaTgt at Ecur
+  // Use actual q from calculator (handles YS≠0 correctly); fall back to YS=0 approx
+  const q_dot=(q_val!=null&&isFinite(q_val)&&q_val>1) ? q_val : 1/Math.max(1-etaTgt,1e-4);
+  const nCur=kremser_N(Ecur,q_dot);
+  if(isFinite(nCur)&&nCur>=1&&nCur<=12){
+    ctx.fillStyle='#7c3aed';
+    ctx.beginPath();ctx.arc(px(nCur),py(etaTgt*100),5,0,2*Math.PI);ctx.fill();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TAB 4 — Column Animation
+// ═══════════════════════════════════════════════════════════════════════════
+let colAnimTimer=null, colAnimFrame=0;
+
+function updateTab4(){
+  const kll=parseFloat($('kll4').value);
+  const E=parseFloat($('e4').value);
+  const XF=parseFloat($('xf4').value);
+  const N=parseInt($('n4').value);
+  $('kll4-val').textContent=kll.toFixed(1);
+  $('e4-val').textContent=E.toFixed(1);
+  $('xf4-val').textContent=XF.toFixed(2);
+  $('n4-val').textContent=N;
+  drawColSteady(kll,E,XF,N,1.0);
+}
+
+function calcColProfile(kll,E,XF,N){
+  // Mapping between Y-X theory notation and Aspen EXTRACT stage numbering:
+  //   Y-X Stage 1 (feed end, X_F enters) = Aspen Stage N (physical bottom for light feed)
+  //   Y-X Stage N (solvent end, Y_S=0 enters) = Aspen Stage 1 (physical top)
+  const FoS=kll/E;
+  const eta=eta_counter(E,N);
+  const XR=XF*(1-eta);
+  const YE=FoS*(XF-XR);
+
+  // Step along the Y-X operating/equilibrium lines from feed end (Y-X Stage 1)
+  // Xyk[k] stores the operating-line point after the k-th vertical step.
+  // X and Y at stage k are computed as Xyk[k].Y/kll (equilibrium).
+  const Xyk=[];
+  let Xc=XF, Yc=YE;
+  Xyk.push({X:Xc, Y:Yc}); // Y-X stage 1 (Aspen stage N)
+  for(let k=1;k<N;k++){
+    // Horizontal to eq: X_eq = Y/kll, Y unchanged
+    const Xeq=Yc/kll;
+    // Vertical to op: Y_op = FoS*Xeq + const
+    const Yop=FoS*Xeq+(YE-FoS*XF);
+    Xyk.push({X:Xeq, Y:Yop});
+    Xc=Xeq; Yc=Yop;
+  }
+  // Map to Aspen stages: Aspen stage n = N - (k-1) where k is Y-X stage
+  // Aspen stage 1 = Y-X stage N = last element of Xyk
+  // FIX: use X = Y/kll (equilibrium) so X and Y are consistent at each stage
+  const Xaspen=new Array(N), Yaspen=new Array(N);
+  for(let k=0;k<N;k++){
+    const aspenN=N-1-k; // Aspen stage index (0-based)
+    if(k<Xyk.length){
+      Yaspen[aspenN]=Xyk[k].Y;          // Y at this stage (correct)
+      Xaspen[aspenN]=Xyk[k].Y/kll;     // X = Y/kll at equilibrium (FIX: was Xyk[k].X which was off by one stage)
+    }
+  }
+  return {Xaspen,Yaspen,XF,XR,YE,FoS,eta};
+}
+
+function drawColSteady(kll,E,XF,N,alpha){
+  const {Xaspen,Yaspen,XR,YE,eta}=calcColProfile(kll,E,XF,N);
+
+  // Column canvas
+  const cv=$('c4-col');
+  const W=cv.width||280, H=cv.height||440;
+  cv.width=W; cv.height=H;
+  const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#f8fafc';ctx.fillRect(0,0,W,H);
+
+  const stageH=Math.min(50,(H-80)/N);
+  const colW=140, colX=(W-colW)/2;
+  const topY=40;
+
+  // Column border
+  ctx.strokeStyle='#94a3b8';ctx.lineWidth=2;
+  ctx.beginPath();ctx.roundRect(colX,topY,colW,stageH*N,4);ctx.stroke();
+
+  // Title labels
+  ctx.fillStyle='#3b82f6';ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+  ctx.fillText('Phase I → (down)',W/2,topY-12);
+  ctx.fillStyle='#ea580c';
+  ctx.fillText('← Phase II (up)',W/2,topY+stageH*N+20);
+
+  // Stages
+  for(let i=0;i<N;i++){
+    const y=topY+i*stageH;
+    const Xv=Xaspen[i]||0, Yv=Yaspen[i]||0;
+    const Xmax=XF*1.1||0.01;
+    const blendX=clamp(Xv/Xmax,0,1);
+    const blendY=clamp(Yv/(kll*Xmax),0,1);
+    const r=Math.round(234+(1-blendX)*16);
+    const g=Math.round(88+blendX*80);
+    const b=50;
+    ctx.fillStyle=`rgba(${r},${g},${b},${alpha*0.7})`;
+    ctx.fillRect(colX+2,y+1,colW-4,stageH-2);
+
+    ctx.fillStyle='#1e40af';
+    ctx.fillRect(colX+2,y+stageH-8,Math.round((colW-4)*blendY),6);
+
+    ctx.strokeStyle='#cbd5e1';ctx.lineWidth=.8;
+    ctx.beginPath();ctx.moveTo(colX,y+stageH);ctx.lineTo(colX+colW,y+stageH);ctx.stroke();
+
+    ctx.fillStyle='#1e293b';ctx.font='10px sans-serif';ctx.textAlign='right';
+    ctx.fillText(`S${i+1}`,colX-4,y+stageH/2+4);
+    ctx.fillStyle='#7c2d12';ctx.font='9px sans-serif';ctx.textAlign='left';
+    ctx.fillText('X:'+Xv.toFixed(3),colX+4,y+stageH/2-2);
+    ctx.fillStyle='#1e40af';
+    ctx.fillText('Y:'+Yv.toFixed(3),colX+4,y+stageH/2+9);
+  }
+
+  // Flow arrows
+  // Phase I arrow down
+  ctx.strokeStyle='#3b82f6';ctx.lineWidth=2;ctx.fillStyle='#3b82f6';
+  ctx.beginPath();ctx.moveTo(colX+colW+18,topY);ctx.lineTo(colX+colW+18,topY+stageH*N);ctx.stroke();
+  arrowHead(ctx,colX+colW+18,topY+stageH*N,0,1,'#3b82f6',7);
+  ctx.font='9px sans-serif';ctx.textAlign='left';ctx.fillText('Phase I',colX+colW+24,topY+stageH*N/2);
+
+  // Phase II arrow up
+  ctx.strokeStyle='#ea580c';ctx.lineWidth=2;ctx.fillStyle='#ea580c';
+  ctx.beginPath();ctx.moveTo(colX-18,topY+stageH*N);ctx.lineTo(colX-18,topY);ctx.stroke();
+  arrowHead(ctx,colX-18,topY,0,-1,'#ea580c',7);
+  ctx.save();ctx.translate(colX-14,topY+stageH*N/2);ctx.rotate(-Math.PI/2);
+  ctx.font='9px sans-serif';ctx.textAlign='center';ctx.fillStyle='#ea580c';
+  ctx.fillText('Phase II',0,0);ctx.restore();
+
+  // Bar chart canvas
+  const bv=$('c4-bar');
+  const BW=bv.clientWidth||380, BH=bv.height||300;
+  bv.width=BW; bv.height=BH;
+  const bctx=bv.getContext('2d');
+  bctx.clearRect(0,0,BW,BH);
+  bctx.fillStyle='#f9fafb';bctx.fillRect(0,0,BW,BH);
+
+  const pad={l:50,r:20,t:24,b:40};
+  const bw2=(BW-pad.l-pad.r)/N-6;
+  const maxY=Math.max(XF*1.2, YE*1.1, 0.01);
+  function bpx(n){return pad.l+(n+0.5)*(BW-pad.l-pad.r)/N;}
+  function bpy(v){return pad.t+(1-v/maxY)*(BH-pad.t-pad.b);}
+
+  // Y axis
+  bctx.strokeStyle='#9ca3af';bctx.lineWidth=1;
+  bctx.beginPath();bctx.moveTo(pad.l,pad.t);bctx.lineTo(pad.l,BH-pad.b);bctx.stroke();
+  [0,0.25,0.5,0.75,1].forEach(v=>{
+    const y=bpy(v*maxY);
+    bctx.strokeStyle='#e5e7eb';bctx.lineWidth=.8;
+    bctx.beginPath();bctx.moveTo(pad.l,y);bctx.lineTo(BW-pad.r,y);bctx.stroke();
+    bctx.fillStyle='#9ca3af';bctx.font='10px sans-serif';bctx.textAlign='right';
+    bctx.fillText((v*maxY).toFixed(2),pad.l-3,y+4);
+  });
+
+  for(let i=0;i<N;i++){
+    const cx=bpx(i);
+    const Xv=Xaspen[i]||0, Yv=Yaspen[i]||0;
+    const hw=bw2/2-2;
+    // X bar
+    bctx.fillStyle='rgba(234,88,12,.8)';
+    bctx.fillRect(cx-bw2/2,bpy(Xv),bw2/2-1,bpy(0)-bpy(Xv));
+    // Y bar
+    bctx.fillStyle='rgba(59,130,246,.8)';
+    bctx.fillRect(cx+1,bpy(Yv),bw2/2-1,bpy(0)-bpy(Yv));
+    bctx.fillStyle='#374151';bctx.font='10px sans-serif';bctx.textAlign='center';
+    bctx.fillText('S'+(i+1),cx,BH-pad.b+14);
+  }
+  bctx.fillStyle='#374151';bctx.font='11px sans-serif';bctx.textAlign='center';
+  bctx.fillText('Aspen Stage Number (1=top, N=bottom)',pad.l+(BW-pad.l-pad.r)/2,BH-4);
+
+  // Stage bars HTML
+  const sb=$('stage-bars');
+  sb.innerHTML='<div style="display:grid;grid-template-columns:30px 1fr 60px 1fr 60px;gap:4px;font-size:.78em;font-weight:700;color:#64748b;padding:2px 0"><span>Stage</span><span>X (Raffinate)</span><span></span><span>Y (Extract)</span><span></span></div>';
+  for(let i=0;i<N;i++){
+    const Xv=Xaspen[i]||0, Yv=Yaspen[i]||0;
+    const Xpct=Math.min(100,Xv/XF*100);
+    const Ypct=Math.min(100,Yv/(kll*XF)*100);
+    sb.innerHTML+=`
+    <div class="stage-row">
+      <span style="font-size:.8em;color:#64748b;min-width:30px">S${i+1}</span>
+      <div class="bar-wrap"><div class="bar-fill bar-x" style="width:${Xpct.toFixed(1)}%"></div></div>
+      <span style="font-size:.78em;color:#ea580c;min-width:50px">${Xv.toFixed(4)}</span>
+      <div class="bar-wrap"><div class="bar-fill bar-y" style="width:${Ypct.toFixed(1)}%"></div></div>
+      <span style="font-size:.78em;color:#3b82f6;min-width:50px">${Yv.toFixed(4)}</span>
+    </div>`;
+  }
+}
+
+function startColAnim(){
+  clearInterval(colAnimTimer);
+  colAnimFrame=0;
+  const kll=parseFloat($('kll4').value);
+  const E=parseFloat($('e4').value);
+  const XF=parseFloat($('xf4').value);
+  const N=parseInt($('n4').value);
+  const frames=30;
+  colAnimTimer=setInterval(()=>{
+    colAnimFrame++;
+    const a=Math.min(1,colAnimFrame/frames);
+    drawColSteady(kll,E,XF*a,N,a);
+    if(colAnimFrame>=frames){clearInterval(colAnimTimer);updateTab4();}
+  },50);
+}
+function stopColAnim(){clearInterval(colAnimTimer);}
+function resetColAnim(){clearInterval(colAnimTimer);updateTab4();}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Init
+// ═══════════════════════════════════════════════════════════════════════════
+window.addEventListener('resize',()=>{
+  updateTab1();
+  if($('t2').classList.contains('active'))updateTab2();
+  if($('t4').classList.contains('active'))updateTab4();
+});
+setTimeout(()=>{
+  updateTab1();
+  updateTab2();
+  calcKremser();
+  updateTab4();
+},200);
+</script>
+</body>
+</html>
