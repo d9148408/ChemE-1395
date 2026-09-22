@@ -92,15 +92,15 @@ Aspen Plus 中有六種流體輸送（壓力變送）單元模塊，如表 3-1 �
 泵主要用於輸送液態流體並使其升壓至指定壓力。泵的功率計算涉及三個層次——從流體獲得的有效功率，到泵軸所消耗的軸功率，再到驅動機所消耗的電功率：
 
 $$
-P_{\text{fluid}} = Q \cdot \Delta P \tag{3-0a}
+P_{\text{fluid}} = Q \cdot \Delta P \qquad \text{(3-0a)}
 $$
 
 $$
-P_{\text{shaft}} = \frac{P_{\text{fluid}}}{\eta_{\text{pump}}} \tag{3-0b}
+P_{\text{shaft}} = \frac{P_{\text{fluid}}}{\eta_{\text{pump}}} \qquad \text{(3-0b)}
 $$
 
 $$
-P_{\text{elec}} = \frac{P_{\text{shaft}}}{\eta_{\text{driver}}} \tag{3-0c}
+P_{\text{elec}} = \frac{P_{\text{shaft}}}{\eta_{\text{driver}}} \qquad \text{(3-0c)}
 $$
 
 式中 $Q$ 為體積流量（m³/s）， $\Delta P$ 為壓力增量（Pa）， $\eta_{\mathrm{pump}}$ 為泵效率， $\eta_{\mathrm{driver}}$ 為驅動機（電機）效率。
@@ -232,13 +232,13 @@ $$
 假設壓縮過程絕熱（無熱量損失）且可逆（無摩擦），對理想氣體，等熵出口溫度 $T_{2,s}$ 為：
 
 $$
-\frac{T_{2,s}}{T_1} = \left(\frac{P_2}{P_1}\right)^{\!\frac{\gamma - 1}{\gamma}} \tag{3-0d}
+\frac{T_{2,s}}{T_1} = \left(\frac{P_2}{P_1}\right)^{\!\frac{\gamma - 1}{\gamma}} \qquad \text{(3-0d)}
 $$
 
 式中 $\gamma = C_p/C_v$ 為比熱容比， $T_1$ 與 $T_{2,s}$ 均須以絕對溫度（K）代入。等熵功（理想壓縮功）：
 
 $$
-W_s = \frac{\gamma}{\gamma - 1} \, R \, T_1 \left[\left(\frac{P_2}{P_1}\right)^{\!\frac{\gamma-1}{\gamma}} - 1\right] \tag{3-0e}
+W_s = \frac{\gamma}{\gamma - 1} \, R \, T_1 \left[\left(\frac{P_2}{P_1}\right)^{\!\frac{\gamma-1}{\gamma}} - 1\right] \qquad \text{(3-0e)}
 $$
 
 式中 $R = 8.314$ J/(mol·K) 為通用氣體常數，$W_s$ 單位為 J/mol。考慮等熵效率 $\eta_s$（ $0 < \eta_s < 1$ ），實際軸功 $W_{\text{shaft}} = W_s / \eta_s$ ，實際出口溫度高於 $T_{2,s}$ 。
@@ -282,7 +282,7 @@ $$
 對於高壓縮比系統（如 $P_2/P_1 > 3$ ），採用多級壓縮並在級間設置**中間冷卻器（Intercooler）**，可顯著降低總壓縮功耗。各級最優壓力比相等時功耗最低，對 $N$ 級壓縮，各級壓力比為：
 
 $$
-r_{\text{stage}} = \left(\frac{P_{\text{final}}}{P_{\text{initial}}}\right)^{\!1/N} \tag{3-0f}
+r_{\text{stage}} = \left(\frac{P_{\text{final}}}{P_{\text{initial}}}\right)^{\!1/N} \qquad \text{(3-0f)}
 $$
 
 中間冷卻溫度越低（理論最優為冷卻至進料溫度 $T_1$ ），節能效果越顯著。
